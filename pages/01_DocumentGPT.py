@@ -59,6 +59,7 @@ def embed_file(file):
     retriever = vectorstore.as_retriever()
 
     memory = ConversationBufferMemory(
+        memory_key="history",
         max_token_limit=120,
         return_messages=True,
     )
@@ -91,7 +92,7 @@ def format_docs(docs):
     return "\n\n".join(document.page_content for document in docs)
 
 
-def load_memory(_):
+def load_memory():
     session_memory = st.session_state["memory"]
     loaded_memory = session_memory.load_memory_variables({})["history"]
     return loaded_memory
@@ -146,9 +147,10 @@ if file:
                 {
                     "context": context_result,
                     "question": message,
-                    "history": load_memory({}),
+                    "history": load_memory(),
                 }
             )
+
             session_memory = st.session_state["memory"]
             session_memory.save_context(
                 {"input": message},
